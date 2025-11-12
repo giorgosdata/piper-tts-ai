@@ -3,6 +3,11 @@ import subprocess, os, time
 
 app = Flask(__name__)
 
+PIPER = "./piper"              # θα κατέβει στο build
+VOICE_DIR = "./voices"
+VOICE = "el-gr-rapunzelina-low"
+FFMPEG = "ffmpeg"
+
 @app.route("/tts", methods=["POST"])
 def tts():
     data = request.get_json(force=True)
@@ -14,21 +19,22 @@ def tts():
     out = f"out_{ts}.wav"
     tel = f"out_{ts}_8k.wav"
 
-    subprocess.run(["piper", "--model", "el-gr-rapunzelina-low.onnx", "--config",
-                    "el-gr-rapunzelina-low.onnx.json", "--output_file", out],
-                   input=text.encode(), check=True)
-    subprocess.run(["ffmpeg", "-y", "-i", out, "-ac", "1", "-ar", "8000", tel])
+    subprocess.run(
+        [PIPER, "--model", f"{VOICE_DIR}/{VOICE}.onnx",
+                 "--config", f"{VOICE_DIR}/{VOICE}.onnx.json",
+                 "--output_file", out],
+        input=text.encode("utf-8"), check=True
+    )
+    subprocess.run([FFMPEG, "-y", "-i", out, "-ac", "1", "-ar", "8000", tel], check=True)
 
-    return jsonify({
-        "ok": True,
-        "audio": request.url_root + "audio/" + tel
-    })
+    return jsonify({"ok": True, "audio": request.url_root + "audio/" + tel})
 
 @app.route("/audio/<path:filename>")
 def audio(filename):
     if not os.path.exists(filename):
-        return "File not found", 404
+        return "Not found", 404
     return send_file(filename, mimetype="audio/wav")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5055)
+    port = int(os.environ.get("PORT", "5055"))
+    app.run(host="0.0.0.0", port=port)
