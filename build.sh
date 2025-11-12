@@ -11,11 +11,6 @@ PIPER_URLS=(
   "https://github.com/rhasspy/piper/releases/latest/download/piper_linux_x86_64.tar.gz"
 )
 
-VOICE_URLS=(
-  "https://github.com/rhasspy/piper/releases/download/2023.11.14/voice-el-gr-rapunzelina-low.tar.gz"
-  "https://github.com/rhasspy/piper/releases/latest/download/voice-el-gr-rapunzelina-low.tar.gz"
-)
-
 fetch_tar() {
   local out="$1"; shift
   for url in "$@"; do
@@ -47,13 +42,18 @@ tar -xzf /tmp/piper.tgz
 chmod +x ./piper
 ./piper --help || true
 
-echo "=== Step 2: Download Greek voice (Rapunzelina - low) ==="
+echo "=== Step 2: Download Greek voice (Hugging Face) ==="
 mkdir -p voices
-fetch_tar /tmp/voice.tgz "${VOICE_URLS[@]}" || {
-  echo "FATAL: Could not download Greek voice from any known URL."
-  exit 1
-}
-tar -xzf /tmp/voice.tgz -C voices
-ls -l voices || true
+BASE="https://huggingface.co/rhasspy/piper-voices/resolve/main/el/el-GR/rapunzelina/low"
+curl -L --fail --retry 6 --retry-connrefused \
+  -o voices/el-gr-rapunzelina-low.onnx \
+  "$BASE/el-gr-rapunzelina-low.onnx"
+curl -L --fail --retry 6 --retry-connrefused \
+  -o voices/el-gr-rapunzelina-low.onnx.json \
+  "$BASE/el-gr-rapunzelina-low.onnx.json"
+
+# γρήγορος έλεγχος ότι δεν κατέβηκε HTML/άδειο
+[ -s voices/el-gr-rapunzelina-low.onnx ] || { echo "FATAL: onnx empty"; exit 1; }
+[ -s voices/el-gr-rapunzelina-low.onnx.json ] || { echo "FATAL: json empty"; exit 1; }
 
 echo "=== Build done ==="
