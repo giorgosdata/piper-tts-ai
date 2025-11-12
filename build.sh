@@ -6,13 +6,12 @@ pip install -r requirements.txt
 
 # 1) Πιθανές εκδόσεις Piper binary (tagged + latest, διάφορα ονόματα)
 PIPER_URLS=(
-  "https://github.com/rhasspy/piper/releases/download/2023.11.14/piper_amd64.tar.gz"
-  "https://github.com/rhasspy/piper/releases/download/2023.11.14/piper_linux_x86_64.tar.gz"
-  "https://github.com/rhasspy/piper/releases/download/2023.11.14/piper_x86_64.tar.gz"
-  "https://github.com/rhasspy/piper/releases/latest/download/piper_amd64.tar.gz"
+  "https://github.com/rhasspy/piper/releases/download/v1.2.0/piper_linux_x86_64.tar.gz"
+  "https://github.com/rhasspy/piper/releases/download/v1.2.0/piper_amd64.tar.gz"
   "https://github.com/rhasspy/piper/releases/latest/download/piper_linux_x86_64.tar.gz"
-  "https://github.com/rhasspy/piper/releases/latest/download/piper_x86_64.tar.gz"
+  "https://github.com/rhasspy/piper/releases/latest/download/piper_amd64.tar.gz"
 )
+
 
 fetch_tar() {
   local out="$1"; shift
