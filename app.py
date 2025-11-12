@@ -3,7 +3,7 @@ import subprocess, os, time, urllib.parse
 
 app = Flask(__name__)
 
-PIPER = "./piper"
+PIPER = "piper"   # <-- αντί για "./piper"
 VOICE_DIR = "./voices"
 VOICE = "el-gr-rapunzelina-low"
 FFMPEG = "ffmpeg"
