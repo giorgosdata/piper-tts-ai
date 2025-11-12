@@ -1,9 +1,9 @@
 from flask import Flask, request, send_file, jsonify
-import subprocess, os, time, urllib.parse
+import subprocess, os, time
 
 app = Flask(__name__)
 
-PIPER = "piper"   # <-- αντί για "./piper"
+PIPER = "piper"
 VOICE_DIR = "./voices"
 VOICE = "el-gr-rapunzelina-low"
 FFMPEG = "ffmpeg"
@@ -21,15 +21,17 @@ def synth(text: str):
     subprocess.run([FFMPEG, "-y", "-i", out, "-ac", "1", "-ar", "8000", tel], check=True)
     return tel
 
+@app.get("/")
+def root():
+    return "root ok"
+
 @app.get("/ping")
 def ping():
-    # γρήγορο healthcheck χωρίς Shell
-    ok = os.path.exists(PIPER) and os.path.exists(f"{VOICE_DIR}/{VOICE}.onnx")
+    ok = os.path.exists(VOICE_DIR)
     return ("ok" if ok else "missing files"), 200 if ok else 500
 
 @app.get("/test")
 def test_get():
-    # χρήση από browser: /test?text=Καλώς ήρθατε
     text = request.args.get("text", "").strip()
     if not text:
         return "Missing ?text=", 400
@@ -54,3 +56,4 @@ def audio(filename):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", "5055"))
     app.run(host="0.0.0.0", port=port)
+
