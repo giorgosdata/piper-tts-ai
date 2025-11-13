@@ -40,28 +40,11 @@ fetch_tar() {
 
 echo "=== Step 1: Download Piper binary ==="
 TMPDIR="$(mktemp -d)"
-fetch_tar "$TMPDIR/piper.tgz" "${PIPER_URLS[@]}" || {
-  echo "FATAL: Could not download Piper binary from any known URL."
-  exit 1
-}
-
-# Αποσυμπίεση σε προσωρινό folder και εντοπισμός του εκτελέσιμου
-mkdir -p "$TMPDIR/unpack"
-tar -xzf "$TMPDIR/piper.tgz" -C "$TMPDIR/unpack"
-
-# Βρες το πραγματικό binary όπου κι αν είναι
-FOUND_BIN="$(find "$TMPDIR/unpack" -type f -name 'piper' -print -quit || true)"
-if [ -z "${FOUND_BIN}" ]; then
-  echo "FATAL: No 'piper' binary found after extraction."
-  find "$TMPDIR/unpack" -maxdepth 2 -print || true
-  exit 1
-fi
-
-# Αντέγραψέ το στη ρίζα του project
-cp "$FOUND_BIN" ./piper
+fetch_tar "$TMPDIR/piper.tgz" "${PIPER_URLS[@]}" || exit 1
+tar -xzf "$TMPDIR/piper.tgz" -C /tmp
 chmod +x ./piper
-file ./piper || true
 ./piper --help || true
+
 
 echo "=== Step 2: Download Greek voice (Hugging Face) ==="
 mkdir -p voices
